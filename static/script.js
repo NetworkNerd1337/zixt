@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const socket = io('https://zixt.app');
+    const socket = io(baseUrl);
 
     socket.on('connect', () => {
         console.log('Connected to SocketIO server');

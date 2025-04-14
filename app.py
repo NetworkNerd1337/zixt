@@ -15,6 +15,7 @@ import redis
 import bleach
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
+from config import BASE_URL
 
 app = Flask(__name__)
 app.secret_key = os.urandom(32)
@@ -53,7 +54,7 @@ def add_security_headers(response):
     response.headers['X-Frame-Options'] = 'DENY'
     response.headers['X-XSS-Protection'] = '1; mode=block'
     response.headers[
-        'Content-Security-Policy'] = "default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self'"
+        'Content-Security-Policy'] = f"default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self'; connect-src 'self' {BASE_URL}"
     response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     return response
 
@@ -67,7 +68,7 @@ def allowed_file(filename):
 
 
 def send_verification_email(email, token):
-    msg = MIMEText(f"Click to verify your Zixt account: https://zixt.app/verify/{token}")
+    msg = MIMEText(f"Click to verify your Zixt account: {BASE_URL}/verify/{token}")
     msg['Subject'] = 'Zixt Email Verification'
     msg['From'] = EMAIL_ADDRESS
     msg['To'] = email
@@ -245,7 +246,7 @@ def dashboard():
 
     conn.close()
     return render_template('dashboard.html', threads=threads, thread_form=thread_form, users=users,
-                           is_admin=session.get('is_admin', False))
+                           is_admin=session.get('is_admin', False), base_url=BASE_URL)
 
 
 @app.route('/thread/<int:thread_id>', methods=['GET', 'POST'])
@@ -328,7 +329,7 @@ def thread(thread_id):
     conn.close()
     return render_template('dashboard.html', thread_id=thread_id, messages=decrypted_messages,
                            participants=participants,
-                           creator_id=thread[0], users=users, form=form)
+                           creator_id=thread[0], users=users, form=form, base_url=BASE_URL)
 
 
 @app.route('/create_thread', methods=['POST'])
@@ -470,4 +471,4 @@ def edit_user(user_id):
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
