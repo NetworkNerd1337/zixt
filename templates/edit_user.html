@@ -2,9 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Zixt - Edit User</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-
+    <h1>Edit User</h1>
+    <a href="{{ url_for('manage_users') }}">Back to Manage Users</a>
+    <form method="POST">
+        <input type="text" name="username" value="{{ user[0] }}" required><br>
+        <input type="email" name="email" value="{{ user[1] }}" required><br>
+        <input type="password" name="password" placeholder="New Password (optional)"><br>
+        <button type="submit">Update</button>
+    </form>
 </body>
 </html>
