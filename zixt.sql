@@ -49,6 +49,6 @@ CREATE TABLE encryption_keys (
 INSERT INTO users (username, email, password, is_admin, is_verified)
 VALUES ('admin', 'admin@zixt.app', '$argon2id$v=19$m=32768,t=16,p=2$...', 1, 1);
 
-CREATE USER 'zixt_user'@'localhost' IDENTIFIED BY 'secure_password';
+CREATE USER 'zixt_user'@'localhost' IDENTIFIED BY 'DR7JD6thr!@#';
 GRANT ALL PRIVILEGES ON zixt_db.* TO 'zixt_user'@'localhost';
 FLUSH PRIVILEGES;

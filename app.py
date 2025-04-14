@@ -26,7 +26,7 @@ socketio = SocketIO(app, cors_allowed_origins="*", async_mode='gevent', message_
 # MySQL Configuration
 db_config = {
     'user': 'zixt_user',
-    'password': 'secure_password',
+    'password': 'DR7JD6thr!@#',
     'host': 'localhost',
     'database': 'zixt_db'
 }
