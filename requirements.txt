@@ -1,0 +1,12 @@
+Flask==2.3.3
+Flask-SQLAlchemy==3.0.5
+PyMySQL==1.1.0
+cryptography==42.0.5
+oqs==0.10.0
+kademlia==0.5
+gunicorn==22.0.0
+flask-socketio==5.3.6
+redis==5.0.8
+bleach==6.1.0
+flask-wtf==1.2.1
+eventlet==0.36.1

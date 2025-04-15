@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="thread-list">
+        <h3>Your Threads</h3>
+        <form method="POST" action="{{ url_for('main.create_thread') }}">
+            {{ thread_form.hidden_tag() }}
+            {{ thread_form.name(placeholder="Thread Name") }}
+            {{ thread_form.usernames(placeholder="Usernames (comma-separated)") }}
+            {{ thread_form.submit }}
+        </form>
+        <ul>
+            {% for thread in threads %}
+                <li>
+                    <a href="{{ url_for('main.thread', thread_id=thread.id) }}">{{ thread.name }}</a>
+                    <form method="POST" action="{{ url_for('main.delete_thread', thread_id=thread.id) }}" style="display:inline;">
+                        {{ csrf_token() }}
+                        <button type="submit" onclick="return confirm('Delete this thread?')">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="chat-area">
+        {% if current_thread %}
+            <h2>{{ current_thread.name }}</h2>
+            {% if current_thread.creator_id == session.user_id %}
+                <form method="POST" action="{{ url_for('main.add_user', thread_id=current_thread.id) }}">
+                    {{ add_user_form.hidden_tag() }}
+                    {{ add_user_form.username(placeholder="Add user") }}
+                    {{ add_user_form.submit }}
+                </form>
+                <h4>Participants</h4>
+                <ul>
+                    {% for participant in participants %}
+                        <li>
+                            {{ participant.username }}
+                            {% if participant.id != session.user_id and current_thread.creator_id == session.user_id %}
+                                <form method="POST" action="{{ url_for('main.remove_user', thread_id=current_thread.id, user_id=participant.id) }}" style="display:inline;">
+                                    {{ csrf_token() }}
+                                    <button type="submit">Remove</button>
+                                </form>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <div class="messages" id="messages">
+                {% for message in messages %}
+                    <div class="message">
+                        <p><strong>{{ message.sender }} ({{ message.timestamp }}):</strong> {{ message.content | safe }}</p>
+                        {% if message.file_name %}
+                            {% if message.file_type in ['image/png', 'image/jpeg', 'image/gif', 'image/bmp'] %}
+                                <img src="{{ url_for('main.download', filename=message.file_path) }}" alt="{{ message.file_name }}" style="max-width: 200px;">
+                            {% else %}
+                                <a href="{{ url_for('main.download', filename=message.file_path) }}">{{ message.file_name }}</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <form id="message-form" enctype="multipart/form-data">
+                {{ message_form.hidden_tag() }}
+                <input type="hidden" name="thread_id" value="{{ current_thread.id }}">
+                {{ message_form.content(placeholder="Type your message") }}
+                {{ message_form.file }}
+                {{ message_form.submit }}
+            </form>
+        {% else %}
+            <p>Select a thread to start messaging.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

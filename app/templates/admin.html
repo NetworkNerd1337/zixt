@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Admin Panel</h2>
+
+<h3>Create User</h3>
+<form method="POST">
+    <input type="hidden" name="action" value="create">
+    <label>Username:</label>
+    <input type="text" name="username" required><br>
+    <label>Email:</label>
+    <input type="email" name="email" required><br>
+    <label>Public Key (Base64):</label>
+    <textarea name="public_key" required></textarea><br>
+    <label>Password:</label>
+    <input type="password" name="password" required><br>
+    <label>Admin: <input type="checkbox" name="is_admin"></label><br>
+    <button type="submit">Create User</button>
+</form>
+
+<h3>Manage Users</h3>
+<table>
+    <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Admin</th>
+        <th>Verified</th>
+        <th>Actions</th>
+    </tr>
+    {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ 'Yes' if user.is_admin else 'No' }}</td>
+            <td>{{ 'Yes' if user.is_verified else 'No' }}</td>
+            <td>
+                <form method="POST">
+                    <input type="hidden" name="action" value="edit">
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <label>Username:</label>
+                    <input type="text" name="username" value="{{ user.username }}" required><br>
+                    <label>Email:</label>
+                    <input type="email" name="email" value="{{ user.email }}" required><br>
+                    <label>Public Key (Base64):</label>
+                    <textarea name="public_key">{{ user.public_key | b64encode }}</textarea><br>
+                    <label>Admin: <input type="checkbox" name="is_admin" {{ 'checked' if user.is_admin }}></label><br>
+                    <button type="submit">Update</button>
+                </form>
+                <form method="POST">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}

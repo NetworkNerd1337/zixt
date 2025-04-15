@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Login</h2>
+<form method="POST">
+    <label>Username:</label>
+    <input type="text" name="username" required><br>
+    <label>Signature (Base64):</label>
+    <textarea name="signature" required></textarea><br>
+    <label>Private Key (Base64):</label>
+    <textarea name="private_key" required></textarea><br>
+    <button type="submit">Login</button>
+</form>
+{% endblock %}

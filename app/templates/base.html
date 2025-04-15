@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zixt - Secure Messaging</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('main.dashboard') }}">Home</a>
+        {% if session.user_id %}
+            <a href="{{ url_for('main.logout') }}">Logout</a>
+            {% if session.is_admin %}
+                <a href="{{ url_for('main.admin') }}">Admin</a>
+            {% endif %}
+            <form method="POST" action="{{ url_for('main.rotate_key') }}">
+                {{ csrf_token() }}
+                <button type="submit">Rotate Key</button>
+            </form>
+        {% else %}
+            <a href="{{ url_for('main.login') }}">Login</a>
+            <a href="{{ url_for('main.register') }}">Register</a>
+        {% endif %}
+    </nav>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</body>
+</html>

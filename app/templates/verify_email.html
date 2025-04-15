@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Email Verification</h2>
+<p>{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {{ messages[0] }}
+    {% else %}
+        Verifying your email...
+    {% endif %}
+{% endwith %}</p>
+{% endblock %}

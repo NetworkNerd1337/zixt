@@ -1,0 +1,15 @@
+body { font-family: Arial, sans-serif; margin: 20px; }
+nav { margin-bottom: 20px; }
+nav a, nav form { margin-right: 10px; display: inline; }
+.alert { padding: 10px; margin: 10px 0; }
+.alert-success { background: #d4edda; color: #155724; }
+.alert-danger { background: #f8d7da; color: #721c24; }
+.container { display: flex; }
+.thread-list { width: 20%; border-right: 1px solid #ccc; padding: 10px; }
+.thread-list ul { list-style: none; padding: 0; }
+.thread-list li { margin: 5px 0; }
+.chat-area { width: 80%; padding: 10px; }
+.messages { border: 1px solid #ccc; padding: 10px; max-height: 500px; overflow-y: auto; }
+.message { margin: 5px 0; }
+#message-form { margin-top: 10px; }
+#message-form textarea { width: 100%; height: 60px; }
