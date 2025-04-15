@@ -32,9 +32,9 @@ db_config = {
 }
 
 # Email Configuration
-EMAIL_ADDRESS = "your_email@example.com"
-EMAIL_PASSWORD = "your_app_password"
-SMTP_SERVER = "smtp.example.com"
+EMAIL_ADDRESS = "notifications@zixt.app"
+EMAIL_PASSWORD = "DR7JD6thr!@#"
+SMTP_SERVER = "mail.zixt.app"
 SMTP_PORT = 587
 
 # File Upload Configuration
