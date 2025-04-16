@@ -180,3 +180,11 @@ VALUES ('admin', 'admin@yourdomain.com', '<base64_public_key>', '<sha3_512_hashe
 ```
 
 * Configure Email Service:
+
+Configure the SMTP settings in config.py appropriately for your SMTP provider or service. This is used for the user email verification system.
+```bash
+SMTP_SERVER = 'smtp.yourdomain.com'
+SMTP_PORT = 465
+SENDER_EMAIL = 'your.email@yourdomain.com'
+SENDER_PASSWORD = 'your-smtp-password'
+```
