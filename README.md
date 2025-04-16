@@ -68,11 +68,25 @@ Install required system packages:
 ```bash
 sudo apt install -y python3 python3-pip python3-venv mysql-server nginx redis-server certbot python3-certbot-nginx build-essential libssl-dev libffi-dev python3-dev cmake ninja-build git
 ```
-
 ### Step 3: Secure MySQL
 
 Configure MySQL with a secure root password:
 ```bash
 sudo mysql_secure_installation
 ```
-_Pro Tip: MySQL installation. this is not a substitute for professionally securing your MySQL installation._
+_Pro Tip: This triggers a generic security configuration for the MySQL installation. This is not a substitute for professionally securing your MySQL installation, however, this is a good start._
+
+### Step 4: Install Redis
+
+Ensure Redis is running:
+```bash
+sudo systemctl enable redis
+sudo systemctl start redis
+redis-cli ping  # Should return "PONG"
+```
+
+### Step 5: Install liboqs for Kyber and SPHINCS+
+
+Zixt uses liboqs for post-quantum cryptography.
+
+## Clone and Build liboqs:
