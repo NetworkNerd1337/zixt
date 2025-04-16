@@ -89,4 +89,4 @@ redis-cli ping  # Should return "PONG"
 
 Zixt uses liboqs for post-quantum cryptography.
 
-## Clone and Build liboqs:
+# Clone and Build liboqs:
