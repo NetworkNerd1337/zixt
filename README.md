@@ -75,4 +75,4 @@ Configure MySQL with a secure root password:
 ```bash
 sudo mysql_secure_installation
 ```
-## Pro Tip: this will provide a generic and basic security configuration for your MySQL installation. this is not a substitute for professionally securing your MySQL installation.
+* Pro Tip: MySQL installation. this is not a substitute for professionally securing your MySQL installation.
