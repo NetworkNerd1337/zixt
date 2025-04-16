@@ -68,3 +68,11 @@ Install required system packages:
 ```bash
 sudo apt install -y python3 python3-pip python3-venv mysql-server nginx redis-server certbot python3-certbot-nginx build-essential libssl-dev libffi-dev python3-dev cmake ninja-build git
 ```
+
+### Step 3: Secure MySQL
+
+Configure MySQL with a secure root password:
+```bash
+sudo mysql_secure_installation
+```
+## Pro Tip: this will provide a generic and basic security configuration for your MySQL installation. this is not a substitute for professionally securing your MySQL installation.
