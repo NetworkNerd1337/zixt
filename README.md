@@ -90,3 +90,18 @@ redis-cli ping  # Should return "PONG"
 Zixt uses liboqs for post-quantum cryptography.
 
 * Clone and Build liboqs:
+```bash
+git clone https://github.com/open-quantum-safe/liboqs.git
+cd liboqs
+mkdir build && cd build
+cmake -GNinja ..
+ninja
+sudo ninja install
+```
+
+* Install liboqs-python:
+```bash
+pip install oqs
+```
+
+### Step 6: Set Up Zixt Application
