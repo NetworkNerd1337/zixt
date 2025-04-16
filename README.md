@@ -65,3 +65,6 @@ sudo apt update && sudo apt upgrade -y
 ### Step 2: Install Dependencies
 
 Install required system packages:
+```bash
+sudo apt install -y python3 python3-pip python3-venv mysql-server nginx redis-server certbot python3-certbot-nginx build-essential libssl-dev libffi-dev python3-dev cmake ninja-build git
+```
