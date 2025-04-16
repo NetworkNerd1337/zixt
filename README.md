@@ -1,44 +1,47 @@
-# Zixt: Secure Post-Quantum Messaging Platform
+# Zixt: Quantum-Secure Messaging Platform
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Ubuntu 24.04](https://img.shields.io/badge/OS-Ubuntu%2024.04-orange.svg)](https://ubuntu.com/)
 
-**Zixt** is a secure, real-time messaging application designed for privacy and future-proof security. Built with **post-quantum cryptography** (Kyber1024, SPHINCS+), it ensures your messages and identity are protected against both classical and quantum attacks. Zixt features multi-user message threads, file attachments, a proprietary blockchain ledger with DHT peer discovery, robust user management, and a scalable architecture using Flask, SocketIO, Redis, Gunicorn, Nginx, and MySQL. Deploy it on **Ubuntu 24.04** with HTTPS via Let's Encrypt for a fully secure experience.
+**Zixt** is a state-of-the-art, web-based messaging application designed for unparalleled security and privacy. Built with **post-quantum cryptography** (Kyber1024 and SPHINCS+), Zixt ensures your communications are protected against both classical and quantum threats. It offers real-time multi-user message threads, secure file sharing, a proprietary blockchain ledger, and robust user management, all running on **Ubuntu 24.04** with Flask, SocketIO, Redis, Gunicorn, Nginx, and MySQL, secured by Let's Encrypt HTTPS.
+
+**Current Version**: See [VERSION.md](VERSION.md) for details.  
+**Release Notes**: Check [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## 🌟 Features
 
-- **Post-Quantum Encryption**:
-  - **Kyber1024 (ML-KEM)**: Quantum-resistant key encapsulation for messages and files with perfect forward secrecy.
-  - **SPHINCS+**: Secure digital signatures for authentication and blockchain integrity.
-  - **AES-256-GCM**: Symmetric encryption for content, derived via HKDF-SHA3-256.
-  - **SHA3-512**: Strongest hashing for passwords and tokens.
+- **Post-Quantum Cryptography**:
+  - **Kyber1024 (ML-KEM)**: Quantum-resistant key encapsulation with perfect forward secrecy (PFS).
+  - **SPHINCS+ (SLH-DSA)**: Quantum-secure digital signatures for authentication and blockchain integrity.
+  - **AES-256-GCM**: Symmetric encryption with HKDF-SHA3-256-derived keys.
+  - **SHA3-512**: Strong hashing for passwords and tokens.
 
 - **Real-Time Messaging**:
-  - Multi-user threads with text and file attachments (images/documents, ≤15MB).
-  - Real-time updates using **SocketIO** and **Redis** for seamless communication.
+  - Multi-user threads for one-on-one or group chats, updated instantly via **SocketIO** and **Redis**.
+  - File attachments (images: PNG, JPEG, GIF, BMP; documents: PDF, TXT, DOC, DOCX; ≤15MB) with inline image display and document links.
   - Input sanitization with Bleach to prevent XSS.
 
 - **Blockchain Ledger**:
   - Proprietary blockchain to log encrypted messages, signed with SPHINCS+.
-  - Decentralized peer discovery via **Kademlia DHT**.
+  - Decentralized peer discovery using **Kademlia DHT**.
 
 - **User Management**:
   - Cryptographic pseudonym login with SPHINCS+ key pairs.
-  - Email verification for self-registration.
-  - Admin panel to create, edit, delete users, and manage public keys.
-  - Key rotation every 30 days with 90-day key history.
+  - Self-registration with email verification via SMTP.
+  - Admin panel for creating, editing, deleting users, and managing public keys.
+  - Key rotation every 30 days, with 90-day key history.
 
 - **Security Enhancements**:
   - **CSRF protection** with Flask-WTF.
-  - **Security headers**: CSP, HSTS, X-Frame-Options, and more.
+  - **Security headers**: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy.
   - **Perfect Forward Secrecy** via ephemeral Kyber keys and TLS ECDHE ciphers.
-  - HTTPS with **Let's Encrypt**.
+  - HTTPS enforced with **Let's Encrypt**.
 
 - **Scalable Architecture**:
   - Flask web framework with Gunicorn WSGI server.
   - Nginx reverse proxy for performance and security.
-  - MySQL for reliable data storage.
+  - MySQL database for reliable storage.
 
 ## 📋 Prerequisites
 
@@ -55,7 +58,7 @@
 
 ## 🛠️ Installation
 
-Follow these steps to set up Zixt on Ubuntu 24.04.
+Follow these steps to deploy Zixt on Ubuntu 24.04. Refer to [VERSION.md](VERSION.md) for the current version.
 
 ### Step 1: Update System
 
