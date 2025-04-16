@@ -162,9 +162,9 @@ print("Password Hash:", crypto.hash_password('your_admin_password'))
     * The code cannot be run directly from the command line without being placed in a Python environment that has access to the app.crypto module, which is part of the Zixt application.
     * It does not need to be saved as a standalone .py file and run from the CLI unless you prefer that approach for convenience.
     * The most straightforward ways to execute it are:
-      1. Interactively in a Python shell within the Zixt project environment.
-      2. As a temporary script saved in a .py file and run from the CLI.
-      3. Using a one-off command in the project directory with the virtual environment activated.
+      * Interactively in a Python shell within the Zixt project environment.
+      * As a temporary script saved in a .py file and run from the CLI.
+      * Using a one-off command in the project directory with the virtual environment activated.
 
 _Given the dependency on app.crypto, the code must be executed in the context of the Zixt project directory with the virtual environment activated to ensure the module is importable._
 
