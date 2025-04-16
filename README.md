@@ -1,10 +1,11 @@
+```markdown
 # Zixt: Quantum-Secure Messaging Platform
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Ubuntu 24.04](https://img.shields.io/badge/OS-Ubuntu%2024.04-orange.svg)](https://ubuntu.com/)
 
-**Zixt** is a state-of-the-art, web-based messaging application designed for unparalleled security and privacy. Built with **post-quantum cryptography** (Kyber1024 and SPHINCS+), Zixt ensures your communications are protected against both classical and quantum threats. It offers real-time multi-user message threads, secure file sharing, a proprietary blockchain ledger, and robust user management, all running on **Ubuntu 24.04** with Flask, SocketIO, Redis, Gunicorn, Nginx, and MySQL, secured by Let's Encrypt HTTPS.
+**Zixt** is a cutting-edge, web-based messaging application engineered for unparalleled security and privacy. Leveraging **post-quantum cryptography** (Kyber1024 and SPHINCS+), Zixt ensures your communications are protected against both classical and quantum threats. It offers real-time multi-user message threads, secure file sharing, a proprietary blockchain ledger, and robust user management, all running on **Ubuntu 24.04** with Flask, SocketIO, Redis, Gunicorn, Nginx, and MySQL, secured by Let's Encrypt HTTPS.
 
 **Current Version**: See [VERSION.md](VERSION.md) for details.  
 **Release Notes**: Check [CHANGELOG.md](CHANGELOG.md) for version history.
@@ -120,8 +121,6 @@ For secure file storage:
 
 ```bash
 mkdir -p app/uploads
-chmod 750 app/uploads
-chown $(whoami):www-data app/uploads
 ```
 
 5. **Configure MySQL Database**:
@@ -154,7 +153,7 @@ source venv/bin/activate
 python
 ```
 
-- Run the following code:
+- Run:
 
 ```python
 from app.crypto import Crypto
@@ -168,13 +167,13 @@ print("Private Key (Save Securely):", base64.b64encode(priv).decode())
 
 Replace `'your_admin_password'` with a secure password (e.g., `'MySecurePass123!'`). Copy the **Public Key**, **Password Hash**, and **Private Key** (store the private key securely, e.g., in a password manager, for admin login).
 
-Exit the shell:
+Exit:
 
 ```python
 exit()
 ```
 
-Alternatively, save the code as a script:
+Alternatively, save as a script:
 
 ```bash
 nano generate_admin_keys.py
@@ -198,7 +197,7 @@ Run:
 python generate_admin_keys.py
 ```
 
-Delete the script after use:
+Delete after use:
 
 ```bash
 rm generate_admin_keys.py
@@ -226,11 +225,11 @@ EXIT;
 
 7. **Configure Email Service**:
 
-Zixt uses SMTP to send verification emails for user registration. Gmail is recommended, but other providers are supported.
+Zixt uses SMTP for email verification. Gmail is recommended, but other providers are supported.
 
 - **Set Up Gmail SMTP**:
 
-  - Ensure you have a Gmail account (e.g., `your.email@gmail.com`).
+  - Ensure a Gmail account (e.g., `your.email@gmail.com`).
   - Enable **2-Step Verification**:
     - Go to [Google Account > Security > 2-Step Verification](https://myaccount.google.com/security).
     - Enable using a phone number or authenticator app.
@@ -238,7 +237,7 @@ Zixt uses SMTP to send verification emails for user registration. Gmail is recom
     - Navigate to [App Passwords](https://myaccount.google.com/security).
     - Select **App** > **Mail**, **Device** > **Other (Custom Name)**, enter `Zixt`.
     - Copy the 16-character password (e.g., `abcd efgh ijkl mnop`).
-    - Store it securely (shown only once).
+    - Store securely (shown only once).
 
 - **Update `config.py`**:
 
@@ -261,7 +260,7 @@ Replace `your.email@gmail.com` and `your_app_password` (no spaces). Save and exi
 
 - **Alternative SMTP Providers** (Optional):
 
-Use providers like SendGrid, HostGator, Postmark, or Amazon SES etc:
+Use providers like SendGrid, Postmark, or Amazon SES:
   - Example for SendGrid:
     - **SMTP Server**: `smtp.sendgrid.net`
     - **SMTP Port**: 465 (SSL)
@@ -321,7 +320,31 @@ sudo ufw allow 465
 
 ### Step 6: Configure Gunicorn
 
-1. **Create Service File**:
+Gunicorn runs Zixt as a WSGI server. For security, use a dedicated, non-root user.
+
+1. **Create a Dedicated User**:
+
+```bash
+sudo adduser --system --group --no-create-home zixtuser
+```
+
+This creates a system user `zixtuser` with minimal privileges.
+
+2. **Set File Permissions**:
+
+Allow `zixtuser` to access the application and share `app/uploads` with Nginx (`www-data`):
+
+```bash
+sudo chown -R zixtuser:zixtuser /path/to/zixt
+sudo chown zixtuser:www-data /path/to/zixt/app/uploads
+sudo chmod 770 /path/to/zixt/app/uploads
+sudo chown -R zixtuser:zixtuser /path/to/zixt/venv
+sudo chmod -R u+rwx /path/to/zixt/venv
+```
+
+Replace `/path/to/zixt` with the actual path.
+
+3. **Create Gunicorn Service**:
 
 ```bash
 sudo nano /etc/systemd/system/zixt.service
@@ -335,7 +358,7 @@ Description=Zixt Gunicorn Service
 After=network.target
 
 [Service]
-User=yourusername
+User=zixtuser
 Group=www-data
 WorkingDirectory=/path/to/zixt
 Environment="PATH=/path/to/zixt/venv/bin"
@@ -345,14 +368,29 @@ ExecStart=/path/to/zixt/venv/bin/gunicorn --workers 4 --bind 0.0.0.0:8000 --work
 WantedBy=multi-user.target
 ```
 
-Replace `/path/to/zixt` and `yourusername`.
+Replace `/path/to/zixt`.
 
-2. **Enable and Start**:
+4. **Enable and Start Service**:
 
 ```bash
+sudo systemctl daemon-reload
 sudo systemctl enable zixt
 sudo systemctl start zixt
 ```
+
+5. **Verify Service**:
+
+```bash
+sudo systemctl status zixt
+```
+
+Check Gunicorn runs as `zixtuser`:
+
+```bash
+ps aux | grep gunicorn
+```
+
+**Note**: For development, you may use your own user account instead of `zixtuser`, but this is not recommended for production due to security risks.
 
 ### Step 7: Configure Nginx
 
@@ -613,8 +651,9 @@ Open issues/pull requests on [GitHub](https://github.com/NetworkNerd1337/zixt).
 
 ## 📧 Contact
 
-[inquiries@zixt.com](mailto:inquiries@zixt.app) or GitHub issues for the Zixt repo.
+[inquries@zixt.app](mailto:inquries@zixt.app) or GitHub issues for the Zixt repo.
 
 ---
 
 *Zixt: Secure today, safe tomorrow.*
+```
