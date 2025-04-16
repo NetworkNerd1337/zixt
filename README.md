@@ -85,9 +85,9 @@ sudo systemctl start redis
 redis-cli ping  # Should return "PONG"
 ```
 
-### Step 5: Install liboqs for Kyber and SPHINCS+
+### Step 5: Install liboqs for Post-Quantum Cryptography
 
-Zixt uses liboqs for post-quantum cryptography.
+Zixt relies on liboqs for Kyber1024 and SPHINCS+.
 
 * Clone and Build liboqs:
 ```bash
@@ -108,8 +108,7 @@ pip install oqs
 
 * Clone Repository:
 ```bash
-git clone https://github.com/yourusername/zixt.git
-cd zixt
+git clone https://github.com/networknerd1337/zixt
 ```
 
 * Create Virtual Environment:
@@ -117,3 +116,67 @@ cd zixt
 python3 -m venv venv
 source venv/bin/activate
 ```
+
+* Install Python Dependencies:
+```bash
+pip install -r requirements.txt
+```
+_Pro Tip: You may encounter issues when attempting to install the whole requirements file and may need to troubleshoot if any of the installations don't complete. Please ensure all requirements are fully installed._
+
+* Create Uploads Folder:
+
+For secure file storage:
+```bash
+mkdir -p app/uploads
+chmod 750 app/uploads
+chown $(whoami):www-data app/uploads
+```
+
+* Configure MySQL Database:
+
+Apply the schema:
+```bash
+sudo mysql -u root -p < setup.sql
+```
+
+* Set Up Admin User:
+
+Generate a SPHINCS+ key pair and password hash:
+```bash
+from app.crypto import Crypto
+import base64
+crypto = Crypto()
+pub, priv = crypto.generate_user_keypair()
+print("Public Key:", base64.b64encode(pub).decode())
+print("Password Hash:", crypto.hash_password('your_admin_password'))
+```
+** This code:
+
+*** Imports the Crypto class from app.crypto.
+*** Generates a SPHINCS+ key pair (public and private keys).
+*** Hashes a password using SHA3-512.
+*** Prints the Base64-encoded public key and hashed password for use in the MySQL admin user setup.
+
+** Execution Context:
+
+*** The code cannot be run directly from the command line without being placed in a Python environment that has access to the app.crypto module, which is part of the Zixt application.
+*** It does not need to be saved as a standalone .py file and run from the CLI unless you prefer that approach for convenience.
+*** The most straightforward ways to execute it are:
+1. Interactively in a Python shell within the Zixt project environment.
+2. As a temporary script saved in a .py file and run from the CLI.
+3. Using a one-off command in the project directory with the virtual environment activated.
+
+_Given the dependency on app.crypto, the code must be executed in the context of the Zixt project directory with the virtual environment activated to ensure the module is importable._
+
+Enter into the MySQL DB environment:
+```bash
+mysql -u root -p
+```
+
+Insert the admin user into the database with the public key and hash that you just generated:
+```bash
+INSERT INTO user (username, email, public_key, password_hash, is_admin, is_verified)
+VALUES ('admin', 'admin@yourdomain.com', '<base64_public_key>', '<sha3_512_hashed_password>', TRUE, TRUE);
+```
+
+* Configure Email Service:
