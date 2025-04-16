@@ -61,3 +61,4 @@ Follow these steps to set up Zixt on Ubuntu 24.04.
 
 ```bash
 sudo apt update && sudo apt upgrade -y
+```
