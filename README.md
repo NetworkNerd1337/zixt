@@ -1,4 +1,3 @@
-```markdown
 # Zixt: Quantum-Secure Messaging Platform
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -656,4 +655,3 @@ Open issues/pull requests on [GitHub](https://github.com/NetworkNerd1337/zixt).
 ---
 
 *Zixt: Secure today, safe tomorrow.*
-```
