@@ -150,21 +150,21 @@ pub, priv = crypto.generate_user_keypair()
 print("Public Key:", base64.b64encode(pub).decode())
 print("Password Hash:", crypto.hash_password('your_admin_password'))
 ```
-*  This code:
+  * This code:
 
-*   Imports the Crypto class from app.crypto.
-*   Generates a SPHINCS+ key pair (public and private keys).
-*   Hashes a password using SHA3-512.
-*   Prints the Base64-encoded public key and hashed password for use in the MySQL admin user setup.
+    * Imports the Crypto class from app.crypto.
+    * Generates a SPHINCS+ key pair (public and private keys).
+    * Hashes a password using SHA3-512.
+    * Prints the Base64-encoded public key and hashed password for use in the MySQL admin user setup.
 
-*  Execution Context:
+  * Execution Context:
 
-*   The code cannot be run directly from the command line without being placed in a Python environment that has access to the app.crypto module, which is part of the Zixt application.
-*   It does not need to be saved as a standalone .py file and run from the CLI unless you prefer that approach for convenience.
-*   The most straightforward ways to execute it are:
-1. Interactively in a Python shell within the Zixt project environment.
-2. As a temporary script saved in a .py file and run from the CLI.
-3. Using a one-off command in the project directory with the virtual environment activated.
+    * The code cannot be run directly from the command line without being placed in a Python environment that has access to the app.crypto module, which is part of the Zixt application.
+    * It does not need to be saved as a standalone .py file and run from the CLI unless you prefer that approach for convenience.
+    * The most straightforward ways to execute it are:
+      1. Interactively in a Python shell within the Zixt project environment.
+      2. As a temporary script saved in a .py file and run from the CLI.
+      3. Using a one-off command in the project directory with the virtual environment activated.
 
 _Given the dependency on app.crypto, the code must be executed in the context of the Zixt project directory with the virtual environment activated to ensure the module is importable._
 
