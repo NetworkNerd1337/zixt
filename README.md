@@ -129,6 +129,7 @@ Apply the schema:
 ```bash
 sudo mysql -u root -p < setup.sql
 ```
+_Please remember to change the user password in the SQL file to match the password complexity level you set, BEFORE attempting to import into MySQL_
 
 6. **Set Up Admin User**:
 
