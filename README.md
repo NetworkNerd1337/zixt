@@ -221,7 +221,7 @@ Replace `'your_admin_password'` with a secure password (e.g., `'MySecurePass123!
 Exit:
 
 ```python
-exit()
+deactivate
 ```
 
 Alternatively, save as a script:
@@ -257,12 +257,13 @@ rm generate_admin_keys.py
 - Insert the admin user into MySQL:
 
 ```bash
-mysql -u root -p
+sudo mysql -u root
 ```
 
 Run:
 
 ```sql
+USE zixt_db;
 INSERT INTO user (username, email, public_key, password_hash, is_admin, is_verified)
 VALUES ('admin', 'admin@yourdomain.com', '<base64_public_key>', '<sha3_512_hash>', TRUE, TRUE);
 ```
