@@ -87,8 +87,8 @@ sudo mysql_secure_installation
 Ensure Redis is active:
 
 ```bash
-sudo systemctl enable redis
-sudo systemctl start redis
+sudo systemctl enable redis-sever
+sudo systemctl start redis-server
 redis-cli ping  # Should return "PONG"
 ```
 
