@@ -74,7 +74,58 @@ Install system packages required for Zixt:
 sudo apt install -y python3 python3-pip python3-venv mysql-server nginx redis-server certbot python3-certbot-nginx build-essential libssl-dev libffi-dev python3-dev cmake ninja-build git
 ```
 
-### Step 3: Secure MySQL
+### Step 3: Install liboqs for Post-Quantum Cryptography
+
+Zixt uses `liboqs` for Kyber1024 and SPHINCS+.
+
+1. Clone and build liboqs:
+```bash
+git clone --branch 0.10.1 https://github.com/open-quantum-safe/liboqs.git
+cd liboqs
+mkdir build && cd build
+cmake -GNinja -DOQS_ALGS_ENABLED=ALL -DOPENSSL_ROOT_DIR=/usr -DOPENSSL_CRYPTO_LIBRARY=/usr/lib/x86_64-linux-gnu/libcrypto.so ..
+ninja
+sudo ninja install
+```
+
+2. Update the library path:
+```bash
+sudo ldconfig
+ldconfig -p | grep liboqs
+```
+
+3. Ensure liboqs.so is listed (e.g., /usr/local/lib/liboqs.so). If not:
+```bash
+echo "/usr/local/lib" | sudo tee /etc/ld.so.conf.d/liboqs.conf
+sudo ldconfig
+```
+
+4. Install liboqs-python from Source:
+```bash
+source /home/rhuff/zixt/venv/bin/activate
+git clone --depth=1 https://github.com/open-quantum-safe/liboqs-python
+cd liboqs-python
+pip install .
+cd .. && rm -rf liboqs-python
+```
+
+_you can alternatively try installing the PyPI oqs package, but we've had mixed success with the PyPI package; we build it from the source. If you want to try the PyPI package, version 0.10.2 is the latest at the time of this writing_
+```bash
+pip install oqs==0.10.2
+```
+
+Verify installation:
+```bash
+python -c "from oqs import KeyEncapsulation, Signature; print(KeyEncapsulation('Kyber1024')); print(Signature('SPHINCS+-SHAKE-256f-simple'))"
+```
+
+The expected output shows object references
+_Example: Key encapsulation mechanism: Kyber1024 or Signature mechanism: SPHINCS+-SHAKE-256f-simple_
+
+If this fails, check the liboqs-python GitHub for troubleshooting or reinstall from source.
+Note: Ensure libssl-dev is installed to avoid CMake errors. If you encounter ImportError in later steps, verify liboqs and oqs-python installations.
+
+### Step 4: Secure MySQL
 
 Set a root password and secure the installation:
 
@@ -82,7 +133,7 @@ Set a root password and secure the installation:
 sudo mysql_secure_installation
 ```
 
-### Step 4: Configure Redis
+### Step 5: Configure Redis
 
 Ensure Redis is active:
 
@@ -92,7 +143,7 @@ sudo systemctl start redis-server
 redis-cli ping  # Should return "PONG"
 ```
 
-### Step 5: Set Up Zixt Application
+### Step 6: Set Up Zixt Application
 
 1. **Clone Repository**:
 
@@ -318,7 +369,7 @@ Ensure port 465 is open:
 sudo ufw allow 465
 ```
 
-### Step 6: Configure Gunicorn
+### Step 7: Configure Gunicorn
 
 Gunicorn runs Zixt as a WSGI server. For security, use a dedicated, non-root user.
 
@@ -392,7 +443,7 @@ ps aux | grep gunicorn
 
 **Note**: For development, you may use your own user account instead of `zixtuser`, but this is not recommended for production due to security risks.
 
-### Step 7: Configure Nginx
+### Step 8: Configure Nginx
 
 1. **Create Configuration**:
 
@@ -448,7 +499,7 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
-### Step 8: Set Up Let's Encrypt
+### Step 9: Set Up Let's Encrypt
 
 1. **Obtain Certificate**:
 
@@ -462,7 +513,7 @@ sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
 sudo certbot renew --dry-run
 ```
 
-### Step 9: Start Blockchain Node
+### Step 10: Start Blockchain Node
 
 Run:
 
