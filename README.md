@@ -111,7 +111,7 @@ source venv/bin/activate
 3. **Install Python Dependencies**:
 
 ```bash
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 4. **Create Uploads Folder**:
