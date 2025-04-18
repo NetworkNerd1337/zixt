@@ -109,7 +109,7 @@ pip install .
 cd .. && rm -rf liboqs-python
 ```
 
-_you can alternatively try installing the PyPI oqs package, but we've had mixed success with the PyPI package; we build it from the source. If you want to try the PyPI package, version 0.10.2 is the latest at the time of this writing_
+_Alternatively, you can try installing the PyPI oqs package, but we've had mixed success with the PyPI package; we build it from the source. If you want to try the PyPI package, version 0.10.2 is the latest at the time of this writing_
 ```bash
 pip install oqs==0.10.2
 ```
