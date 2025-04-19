@@ -13,7 +13,7 @@ class Block:
         self.index = index
         self.previous_hash = previous_hash
         self.timestamp = timestamp
-        self.data = data
+        self.data = data  # Includes zkp_proof
         self.signature = signature
         self.hash = self.calculate_hash()
 
