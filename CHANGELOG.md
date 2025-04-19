@@ -6,7 +6,7 @@ All notable changes to the Zixt secure messaging application are documented in t
 
 No unreleased changes at this time.
 
-## [1.0.2] - 2025-04-20
+## [1.0.2] - 2025-04-19
 
 ### Added
 - **Zero Knowledge Proofs (ZKPs)**:
