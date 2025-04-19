@@ -11,4 +11,4 @@ Zixt follows semantic versioning (`MAJOR.MINOR.PATCH`):
 - **MINOR**: New features, backward-compatible.
 - **PATCH**: Bug fixes, minor improvements.
 
-For the latest updates, check the [GitHub repository](https://github.com/yourusername/zixt).
+For the latest updates, check the [GitHub repository](https://github.com/NetworkNerd1337/zixt).
