@@ -12,4 +12,4 @@ currently being supported with security updates.
 
 ## Reporting a Vulnerability
 
-If you have discovered a vulnerability or security issue with Zixt, please create an issue for the GitHub project.
+If you have discovered a vulnerability or security issue with Zixt, please get in touch with us directly at https://zixt.app/contact/ or create an issue for the GitHub project.
