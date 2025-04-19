@@ -48,7 +48,7 @@
             <div class="messages" id="messages">
                 {% for message in messages %}
                     <div class="message">
-                        <p><strong>{{ message.sender }} ({{ message.timestamp }}):</strong> {{ message.content | safe }}</p>
+                        <p>{{ message.content | safe }}</p>
                         {% if message.file_name %}
                             {% if message.file_type in ['image/png', 'image/jpeg', 'image/gif', 'image/bmp'] %}
                                 <img src="{{ url_for('main.download', filename=message.file_path) }}" alt="{{ message.file_name }}" style="max-width: 200px;">
