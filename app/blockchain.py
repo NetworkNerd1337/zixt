@@ -1,5 +1,5 @@
 from app.crypto import Crypto
-from kademlia.network import Server
+from app.dht import DTLSServer
 import hashlib
 import json
 import time
@@ -30,7 +30,7 @@ class Blockchain:
     def __init__(self):
         self.crypto = Crypto()
         self.chain = [self.create_genesis_block()]
-        self.dht_server = Server()
+        self.dht_server = DTLSServer()
         self.node_id = hashlib.sha3_256(str(time.time()).encode()).hexdigest()
 
     def create_genesis_block(self):
