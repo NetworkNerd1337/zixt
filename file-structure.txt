@@ -33,6 +33,9 @@
 │   │   ├── auth_0001.zkey
 │   │   ├── message.wasm
 │   │   ├── message_0001.zkey
+├── /certs
+│   ├── server.crt
+│   ├── server.key
 ├── requirements.txt
 ├── config.py
 ├── wsgi.py
