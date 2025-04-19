@@ -27,6 +27,14 @@ CREATE TABLE user_key_history (
     FOREIGN KEY (user_id) REFERENCES user(id)
 );
 
+CREATE TABLE user_public_key_hash (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    public_key_hash VARCHAR(128) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES user(id)
+);
+
 CREATE TABLE thread (
     id INT AUTO_INCREMENT PRIMARY KEY,
     creator_id INT NOT NULL,
@@ -47,12 +55,11 @@ CREATE TABLE thread_participant (
 CREATE TABLE message (
     id INT AUTO_INCREMENT PRIMARY KEY,
     thread_id INT NOT NULL,
-    sender VARCHAR(80) NOT NULL,
     content TEXT NOT NULL,
     ciphertext TEXT NOT NULL,
+    zkp_proof BLOB NOT NULL,
     file_path VARCHAR(256),
     file_name VARCHAR(100),
     file_type VARCHAR(50),
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (thread_id) REFERENCES thread(id)
 );
