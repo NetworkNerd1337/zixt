@@ -1,0 +1,44 @@
+/zixt
+├── /app
+│   ├── __init__.py
+│   ├── routes.py
+│   ├── blockchain.py
+│   ├── crypto.py
+│   ├── dht.py
+│   ├── models.py
+│   ├── email.py
+│   ├── /circuits
+│   │   ├── auth.circom
+│   │   ├── message.circom
+│   │   ├── auth.wasm
+│   │   ├── auth_0001.zkey
+│   │   ├── message.wasm
+│   │   ├── message_0001.zkey
+│   │   ├── auth_verification_key.json
+│   │   ├── message_verification_key.json
+│   ├── /uploads
+│   └── /templates
+│       ├── base.html
+│       ├── login.html
+│       ├── register.html
+│       ├── verify_email.html
+│       ├── dashboard.html
+│       ├── admin.html
+│       └── email_verification.html
+├── /static
+│   ├── style.css
+│   ├── script.js
+│   ├── /circuits
+│   │   ├── auth.wasm
+│   │   ├── auth_0001.zkey
+│   │   ├── message.wasm
+│   │   ├── message_0001.zkey
+├── requirements.txt
+├── config.py
+├── wsgi.py
+├── setup.sql
+├── README.md
+├── VERSION.md
+├── CHANGELOG.md
+└── /scripts
+    └── keygen.py
