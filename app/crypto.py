@@ -8,7 +8,6 @@ import base64
 import hashlib
 from datetime import datetime, timedelta
 
-
 class Crypto:
     def __init__(self):
         self.kem = KeyEncapsulation("Kyber1024")
@@ -27,9 +26,8 @@ class Crypto:
     def rotate_user_key(self, user):
         from .models import UserKeyHistory
         old_public_key = user.public_key
-        old_private_key = None  # Assume secure storage elsewhere
+        old_private_key = None
         new_public_key, new_private_key = self.generate_user_keypair()
-
         key_history = UserKeyHistory(
             user_id=user.id,
             public_key=old_public_key,
