@@ -1,13 +1,13 @@
-# Zixt: Quantum-Secure Messaging & Collaboration Platform
+# Zixt: Quantum-Secure Messaging Platform
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Ubuntu 24.04](https://img.shields.io/badge/OS-Ubuntu%2024.04-orange.svg)](https://ubuntu.com/)
 
-**Zixt** is a cutting-edge, web-based messaging application engineered for unparalleled security and privacy. Leveraging **post-quantum cryptography** (Kyber1024 and SPHINCS+), Zixt ensures your communications are protected against both classical and quantum threats. It offers real-time multi-user message threads, secure file sharing, a proprietary blockchain ledger, and robust user management, all running on **Ubuntu 24.04** with Flask, SocketIO, Redis, Gunicorn, Nginx, and MySQL, secured by Let's Encrypt HTTPS.
+**Zixt** is a state-of-the-art, web-based messaging application engineered for unparalleled security and privacy. Built with **post-quantum cryptography** (Kyber1024, SPHINCS+), **zero-knowledge proofs (zk-SNARKs)**, and **encrypted DHT**, Zixt protects communications and metadata against classical and quantum threats. It offers real-time multi-user message threads, secure file sharing, a proprietary blockchain ledger, and robust user management, running on **Ubuntu 24.04** with Flask, SocketIO, Redis, Gunicorn, Nginx, and MySQL, secured by Let's Encrypt HTTPS.
 
-**Current Version**: See [VERSION.md](VERSION.md) for details.  
-**Release Notes**: Check [CHANGELOG.md](CHANGELOG.md) for version history.
+**Current Version**: See [VERSION.md](VERSION.md).  
+**Release Notes**: Check [CHANGELOG.md](CHANGELOG.md).
 
 ## 🌟 Features
 
@@ -15,28 +15,35 @@
   - **Kyber1024 (ML-KEM)**: Quantum-resistant key encapsulation with perfect forward secrecy (PFS).
   - **SPHINCS+ (SLH-DSA)**: Quantum-secure digital signatures for authentication and blockchain integrity.
   - **AES-256-GCM**: Symmetric encryption with HKDF-SHA3-256-derived keys.
-  - **SHA3-512**: Strong hashing for passwords and tokens.
+  - **SHA3-512**: Robust hashing for passwords and verification tokens.
+
+- **Zero-Knowledge Proofs (ZKPs)**:
+  - zk-SNARKs for private user authentication and anonymous message metadata, protecting usernames, sender details, and timestamps.
+  - Privacy-preserving blockchain logging with hidden metadata.
+
+- **Encrypted Distributed Hash Table (DHT)**:
+  - Kademlia DHT with DTLS (Datagram TLS) for secure peer discovery and block propagation, encrypting all traffic to prevent metadata exposure.
 
 - **Real-Time Messaging**:
-  - Multi-user threads for one-on-one or group chats, updated instantly via **SocketIO** and **Redis**.
-  - File attachments (images: PNG, JPEG, GIF, BMP; documents: PDF, TXT, DOC, DOCX; ≤15MB) with inline image display and document links.
-  - Input sanitization with Bleach to prevent XSS.
+  - Multi-user threads for one-on-one or group chats, updated instantly via SocketIO and Redis.
+  - Secure file attachments (images: PNG, JPEG, GIF, BMP; documents: PDF, TXT, DOC, DOCX; ≤15MB) with inline image display.
+  - Input sanitization with Bleach to prevent XSS attacks.
 
 - **Blockchain Ledger**:
-  - Proprietary blockchain to log encrypted messages, signed with SPHINCS+.
-  - Decentralized peer discovery using **Kademlia DHT**.
+  - Proprietary blockchain to log encrypted messages, signed with SPHINCS+ and protected by ZKP proofs.
+  - Decentralized peer discovery via encrypted DHT.
 
 - **User Management**:
-  - Cryptographic pseudonym login with SPHINCS+ key pairs.
+  - Cryptographic pseudonym login with SPHINCS+ key pairs and ZKP proofs.
   - Self-registration with email verification via SMTP.
-  - Admin panel for creating, editing, deleting users, and managing public keys.
-  - Key rotation every 30 days, with 90-day key history.
+  - Admin panel for creating, editing, and deleting users, and managing public keys.
+  - Key rotation every 30 days with 90-day key history.
 
 - **Security Enhancements**:
-  - **CSRF protection** with Flask-WTF.
-  - **Security headers**: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy.
-  - **Perfect Forward Secrecy** via ephemeral Kyber keys and TLS ECDHE ciphers.
-  - HTTPS enforced with **Let's Encrypt**.
+  - CSRF protection with Flask-WTF.
+  - Security headers: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy.
+  - Perfect Forward Secrecy via ephemeral Kyber keys and TLS ECDHE ciphers.
+  - HTTPS enforced with Let's Encrypt.
 
 - **Scalable Architecture**:
   - Flask web framework with Gunicorn WSGI server.
@@ -47,14 +54,16 @@
 
 - **Operating System**: Ubuntu 24.04 LTS
 - **Hardware**: Minimum 2GB RAM, 20GB disk space
-- **Network**: Internet access, domain name (or IP), ports 80, 443, 8468 open
+- **Network**: Internet access, domain name (or IP), ports 80, 443, 8468 (UDP) open
 - **Software**:
   - Python 3.10 or higher
   - MySQL 8.0+
   - Nginx
   - Redis
   - Git
+  - Node.js, npm
   - Build tools (cmake, ninja)
+  - OpenSSL for DTLS certificates
 
 ## 🛠️ Installation
 
@@ -71,14 +80,39 @@ sudo apt update && sudo apt upgrade -y
 Install system packages required for Zixt:
 
 ```bash
-sudo apt install -y python3 python3-pip python3-venv mysql-server nginx redis-server certbot python3-certbot-nginx build-essential libssl-dev libffi-dev python3-dev cmake ninja-build git
+sudo apt install -y python3 python3-pip python3-venv mysql-server nginx redis-server certbot python3-certbot-nginx build-essential libssl-dev libffi-dev python3-dev cmake ninja-build git nodejs npm
 ```
 
-### Step 3: Install liboqs for Post-Quantum Cryptography
+### Step 3: Secure MySQL
+
+Set a secure root password and configure MySQL:
+
+```bash
+sudo mysql_secure_installation
+```
+
+### Step 4: Configure Redis
+
+Ensure Redis is running:
+
+```bash
+sudo systemctl enable redis
+sudo systemctl start redis
+redis-cli ping  # Should return "PONG"
+```
+
+### Step 5: Install liboqs for Post-Quantum Cryptography
 
 Zixt uses `liboqs` for Kyber1024 and SPHINCS+.
 
-1. Clone and build liboqs:
+1. **Install Build Dependencies**:
+
+```bash
+sudo apt install -y build-essential cmake ninja-build libssl-dev
+```
+
+2. **Clone and Build liboqs**:
+
 ```bash
 git clone --branch 0.10.1 https://github.com/open-quantum-safe/liboqs.git
 cd liboqs
@@ -88,62 +122,75 @@ ninja
 sudo ninja install
 ```
 
-2. Update the library path:
+3. **Update Library Path**:
+
 ```bash
 sudo ldconfig
 ldconfig -p | grep liboqs
 ```
 
-3. Ensure liboqs.so is listed (e.g., /usr/local/lib/liboqs.so). If not:
+If `liboqs.so` is not listed (e.g., `/usr/local/lib/liboqs.so`):
+
 ```bash
 echo "/usr/local/lib" | sudo tee /etc/ld.so.conf.d/liboqs.conf
 sudo ldconfig
 ```
 
-4. Install liboqs-python from Source:
+4. **Install liboqs-python from Source**:
+
+Due to potential issues with the PyPI package, install `oqs-python` from source:
+
 ```bash
-source /home/rhuff/zixt/venv/bin/activate
+cd /path/to/zixt
+source venv/bin/activate
 git clone --depth=1 https://github.com/open-quantum-safe/liboqs-python
 cd liboqs-python
 pip install .
 cd .. && rm -rf liboqs-python
 ```
 
-_Alternatively, you can try installing the PyPI oqs package, but we've had mixed success with the PyPI package; we build it from the source. If you want to try the PyPI package, version 0.10.2 is the latest at the time of this writing_
-```bash
-pip install oqs==0.10.2
-```
+5. **Verify Installation**:
 
-Verify installation:
 ```bash
 python -c "from oqs import KeyEncapsulation, Signature; print(KeyEncapsulation('Kyber1024')); print(Signature('SPHINCS+-SHAKE-256f-simple'))"
 ```
 
-The expected output shows object references
-_Example: Key encapsulation mechanism: Kyber1024 or Signature mechanism: SPHINCS+-SHAKE-256f-simple_
+Expected output shows object references. If this fails, check [liboqs-python GitHub](https://github.com/open-quantum-safe/liboqs-python) or reinstall.
 
-If this fails, check the liboqs-python GitHub for troubleshooting or reinstall from source.
-Note: Ensure libssl-dev is installed to avoid CMake errors. If you encounter ImportError in later steps, verify liboqs and oqs-python installations.
+### Step 6: Install ZKP Dependencies
 
-### Step 4: Secure MySQL
+Zixt uses zk-SNARKs for metadata privacy, requiring `circom` and `snarkjs`.
 
-Set a root password and secure the installation:
+1. **Install Node.js and npm**:
 
 ```bash
-sudo mysql_secure_installation
+sudo apt install -y nodejs npm
 ```
 
-### Step 5: Configure Redis
-
-Ensure Redis is active:
+2. **Install `circom`**:
 
 ```bash
-sudo systemctl enable redis-sever
-sudo systemctl start redis-server
-redis-cli ping  # Should return "PONG"
+npm install -g circom
 ```
 
-### Step 6: Set Up Zixt Application
+3. **Install `snarkjs`**:
+
+```bash
+cd /path/to/zixt
+npm init -y
+npm install snarkjs
+```
+
+4. **Verify Installation**:
+
+```bash
+circom --version
+node -e "require('snarkjs')"
+```
+
+Ensure no errors. If issues arise, consult [circom](https://docs.circom.io) or [snarkjs](https://github.com/iden3/snarkjs) documentation.
+
+### Step 7: Set Up Zixt Application
 
 1. **Clone Repository**:
 
@@ -162,27 +209,51 @@ source venv/bin/activate
 3. **Install Python Dependencies**:
 
 ```bash
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-4. **Create Uploads Folder**:
-
-For secure file storage:
+4. **Create Uploads and Certs Folders**:
 
 ```bash
-mkdir -p app/uploads
+mkdir -p app/uploads certs
 ```
 
-5. **Configure MySQL Database**:
+5. **Generate DTLS Certificates**:
 
-Apply the schema:
+Zixt uses DTLS for secure DHT communication:
+
+```bash
+openssl req -x509 -newkey rsa:4096 -keyout certs/server.key -out certs/server.crt -days 365 -nodes -subj "/CN=zixt"
+sudo chown zixtuser:zixtuser certs/server.crt certs/server.key
+sudo chmod 600 certs/server.key
+```
+
+6. **Configure MySQL Database**:
+
+Apply the database schema:
 
 ```bash
 sudo mysql -u root -p < setup.sql
 ```
-_Please remember to change the user password in the SQL file to match the password complexity level you set, BEFORE attempting to import into MySQL_
 
-6. **Set Up Admin User**:
+7. **Generate ZKP Circuits**:
+
+Generate circuit files for zk-SNARKs:
+
+```bash
+cd app/circuits
+circom auth.circom --r1cs --wasm --sym
+circom message.circom --r1cs --wasm --sym
+snarkjs powersoftau new bn128 12 pot12_0000.ptau
+snarkjs powersoftau contribute pot12_0000.ptau pot12_0001.ptau --name="First contribution" -v
+snarkjs groth16 setup auth.r1cs pot12_0001.ptau auth_0000.zkey
+snarkjs zkey contribute auth_0000.zkey auth_0001.zkey --name="Second contribution" -v
+snarkjs groth16 setup message.r1cs pot12_0001.ptau message_0000.zkey
+snarkjs zkey contribute message_0000.zkey message_0001.zkey --name="Second contribution" -v
+cp auth.wasm auth_0001.zkey message.wasm message_0001.zkey ../../static/circuits/
+```
+
+8. **Set Up Admin User**:
 
 Generate a SPHINCS+ key pair and password hash for the admin user.
 
@@ -204,7 +275,7 @@ source venv/bin/activate
 python
 ```
 
-- Run:
+- Run the following code:
 
 ```python
 from app.crypto import Crypto
@@ -218,10 +289,10 @@ print("Private Key (Save Securely):", base64.b64encode(priv).decode())
 
 Replace `'your_admin_password'` with a secure password (e.g., `'MySecurePass123!'`). Copy the **Public Key**, **Password Hash**, and **Private Key** (store the private key securely, e.g., in a password manager, for admin login).
 
-Exit:
+Exit the shell:
 
 ```python
-deactivate
+exit()
 ```
 
 Alternatively, save as a script:
@@ -257,25 +328,33 @@ rm generate_admin_keys.py
 - Insert the admin user into MySQL:
 
 ```bash
-sudo mysql -u root
+mysql -u root -p
 ```
 
 Run:
 
 ```sql
-USE zixt_db;
 INSERT INTO user (username, email, public_key, password_hash, is_admin, is_verified)
 VALUES ('admin', 'admin@yourdomain.com', '<base64_public_key>', '<sha3_512_hash>', TRUE, TRUE);
+INSERT INTO user_public_key_hash (user_id, public_key_hash)
+VALUES (LAST_INSERT_ID(), '<sha3_512_public_key_hash>');
 ```
 
-Replace `<base64_public_key>` and `<sha3_512_hash>` with the copied values. Verify:
+Compute `<sha3_512_public_key_hash>`:
+
+```python
+import hashlib
+print(hashlib.sha3_512(base64.b64decode('<base64_public_key>')).hexdigest())
+```
+
+Verify:
 
 ```sql
 SELECT username, email, is_admin, is_verified FROM user;
 EXIT;
 ```
 
-7. **Configure Email Service**:
+9. **Configure Email Service**:
 
 Zixt uses SMTP for email verification. Gmail is recommended, but other providers are supported.
 
@@ -322,7 +401,6 @@ Use providers like SendGrid, Postmark, or Amazon SES:
   - For TLS on port 587, modify `app/email.py`:
 
 ```python
-# In EmailService.send_verification_email
 with smtplib.SMTP(smtp_server, smtp_port) as server:
     server.starttls()
     server.login(self.sender_email, self.sender_password)
@@ -370,21 +448,17 @@ Ensure port 465 is open:
 sudo ufw allow 465
 ```
 
-### Step 7: Configure Gunicorn
+### Step 8: Configure Gunicorn
 
-Gunicorn runs Zixt as a WSGI server. For security, use a dedicated, non-root user.
+Gunicorn runs Zixt as a WSGI server with a dedicated user for security.
 
-1. **Create a Dedicated User**:
+1. **Create Dedicated User**:
 
 ```bash
 sudo adduser --system --group --no-create-home zixtuser
 ```
 
-This creates a system user `zixtuser` with minimal privileges.
-
 2. **Set File Permissions**:
-
-Allow `zixtuser` to access the application and share `app/uploads` with Nginx (`www-data`):
 
 ```bash
 sudo chown -R zixtuser:zixtuser /path/to/zixt
@@ -392,6 +466,8 @@ sudo chown zixtuser:www-data /path/to/zixt/app/uploads
 sudo chmod 770 /path/to/zixt/app/uploads
 sudo chown -R zixtuser:zixtuser /path/to/zixt/venv
 sudo chmod -R u+rwx /path/to/zixt/venv
+sudo chown zixtuser:zixtuser /path/to/zixt/certs/server.crt /path/to/zixt/certs/server.key
+sudo chmod 600 /path/to/zixt/certs/server.key
 ```
 
 Replace `/path/to/zixt` with the actual path.
@@ -436,7 +512,7 @@ sudo systemctl start zixt
 sudo systemctl status zixt
 ```
 
-Check Gunicorn runs as `zixtuser`:
+Ensure Gunicorn runs as `zixtuser`:
 
 ```bash
 ps aux | grep gunicorn
@@ -444,7 +520,7 @@ ps aux | grep gunicorn
 
 **Note**: For development, you may use your own user account instead of `zixtuser`, but this is not recommended for production due to security risks.
 
-### Step 8: Configure Nginx
+### Step 9: Configure Nginx
 
 1. **Create Configuration**:
 
@@ -500,7 +576,7 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
-### Step 9: Set Up Let's Encrypt
+### Step 10: Set Up Let's Encrypt
 
 1. **Obtain Certificate**:
 
@@ -514,84 +590,123 @@ sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
 sudo certbot renew --dry-run
 ```
 
-### Step 10: Start Blockchain Node
+### Step 11: Start Blockchain Node
 
-Run:
+Run the blockchain node with encrypted DHT:
 
 ```bash
+source venv/bin/activate
 python -m app.blockchain
 ```
 
-Connect to other nodes:
+To connect to other nodes:
 
 ```python
 from app.blockchain import Blockchain
 import asyncio
 blockchain = Blockchain()
-bootstrap_nodes = [("bootstrap.node.ip", 8468)]
+bootstrap_nodes = [("192.168.1.100", 8468)]
 asyncio.run(blockchain.start_dht(bootstrap_nodes))
+```
+
+Ensure port 8468 is open for UDP:
+
+```bash
+sudo ufw allow 8468/udp
 ```
 
 ## 🔑 Key Generation
 
-Zixt uses SPHINCS+ for authentication.
+Zixt uses SPHINCS+ for secure authentication. Generate key pairs for registration and login.
 
 ### General Steps
 
 1. **Run Keygen Script**:
 
 ```bash
+cd /path/to/zixt
+source venv/bin/activate
 python scripts/keygen.py
 ```
 
-Creates:
-- `zixt_public_key.txt`: Public key.
-- `zixt_private_key.txt`: Private key (store securely).
+This creates:
+- `zixt_public_key.txt`: Public key for registration.
+- `zixt_private_key.txt`: Private key for signing (store securely).
 
 2. **Save Keys**:
 
-Secure `zixt_private_key.txt` (e.g., password manager).
+- Secure `zixt_private_key.txt` (e.g., encrypted USB, password manager).
+- Use `zixt_public_key.txt` during registration.
 
-### Platform-Specific
+### Platform-Specific Instructions
 
 #### MacBook
 
+1. Install dependencies:
+
 ```bash
 brew install python3
-pip3 install oqs
+cd /path/to/zixt
+source venv/bin/activate
+pip install oqs==0.10.1
+```
+
+2. Run:
+
+```bash
 python3 scripts/keygen.py
 ```
 
 #### Windows
 
-Install Python from [python.org](https://www.python.org/downloads/).
+1. Install Python from [python.org](https://www.python.org/downloads/), ensure `pip` is included.
+2. Install oqs:
 
 ```bash
-pip install oqs
+cd /path/to/zixt
+.\venv\Scripts\activate
+pip install oqs==0.10.1
+```
+
+3. Run:
+
+```bash
 python scripts\keygen.py
 ```
 
 #### iPhone
 
-Use **Pythonista** or generate keys on another device.
+1. Use **Pythonista** (App Store), transfer `keygen.py` via iCloud.
+2. Alternative: Generate keys on another device and transfer securely.
 
 #### Android
 
-Install **Termux** (F-Droid):
+1. Install **Termux** (F-Droid):
 
 ```bash
 pkg install python
-pip install oqs
+cd /path/to/zixt
+source venv/bin/activate
+pip install oqs==0.10.1
+```
+
+2. Run:
+
+```bash
 python scripts/keygen.py
 ```
 
 ## 🚀 Usage
+
+Zixt provides a secure, browser-based messaging platform with ZKP-enhanced privacy. Below are detailed instructions with examples.
 
 ### 1. Register a User
 
 1. **Generate Keys**:
 
 ```bash
+cd /path/to/zixt
+source venv/bin/activate
 python scripts/keygen.py
 ```
 
@@ -599,111 +714,248 @@ Output:
 ```
 Public Key (Base64): <your_public_key>
 Private Key (Base64): <your_private_key>
+Keys saved to zixt_public_key.txt and zixt_private_key.txt
 ```
 
 2. **Register**:
 
-- Visit `https://yourdomain.com/register`.
+- Open `https://yourdomain.com/register` in a browser.
 - Enter:
-  - Username: `alice`
-  - Email: `alice@example.com`
-  - Public Key: `<your_public_key>`
-  - Password: Strong password
-- Verify email via the sent link.
+  - **Username**: e.g., `alice`
+  - **Email**: e.g., `alice@example.com`
+  - **Public Key**: Paste `<your_public_key>` from `zixt_public_key.txt`.
+  - **Password**: Choose a strong password.
+- Submit the form.
+
+3. **Verify Email**:
+
+- Check your email for a verification link.
+- Click the link to activate your account.
+
+**Example**:
+- Alice registers with username `alice`, email `alice@example.com`, and her SPHINCS+ public key.
+- She verifies her email and proceeds to log in.
 
 ### 2. Log In
 
-1. **Generate Signature**:
+1. **Generate Public Key Hash and ZKP Proof**:
+
+Compute the SHA3-512 hash of your public key and generate a ZKP proof client-side (handled by `script.js` in the login form). For manual testing:
 
 ```python
-from oqs import Signature
-import base64
-sig = Signature("SPHINCS+-SHAKE-256f-simple")
-sig.import_secret_key(base64.b64decode("<your_private_key>"))
-signature = sig.sign("alice".encode())
-print(base64.b64encode(signature).decode())
+import hashlib
+public_key = base64.b64decode('<your_public_key>')
+public_key_hash = hashlib.sha3_512(public_key).hexdigest()
+print("Public Key Hash:", public_key_hash)
 ```
+
+The ZKP proof requires JavaScript execution in the browser, using `snarkjs` to generate a proof for the `auth.circom` circuit.
 
 2. **Log In**:
 
 - Go to `https://yourdomain.com/login`.
-- Enter username, signature, and private key.
+- Enter:
+  - **Public Key Hash**: `<public_key_hash>` from above.
+  - **ZKP Proof**: Generated by the login form (JSON format).
+  - **Private Key**: Paste `<your_private_key>` (for decryption).
+- Click "Login".
 
-### 3. Message Threads
+**Example**:
+- Alice enters her public key hash, browser-generated ZKP proof, and private key, then logs in successfully.
 
-1. **Create Thread**:
+### 3. Create and Manage Message Threads
 
-- On dashboard, enter:
-  - Thread Name: `Team Sync`
-  - Usernames: `bob,carol`
+1. **Create a Thread**:
+
+- On the dashboard (`https://yourdomain.com`), enter:
+  - **Thread Name**: e.g., `Project Discussion`
+  - **Usernames**: e.g., `bob,carol` (comma-separated).
 - Click "Create Thread".
 
-2. **Manage Thread**:
+2. **Add Users** (Creator Only):
 
-- Add user: `dave`
-- Remove user: `carol`
-- Delete thread (your view only).
+- In the thread view, enter a username (e.g., `dave`).
+- Click "Add".
+
+3. **Remove Users** (Creator Only):
+
+- Click "Remove" next to a participant’s name (e.g., `carol`).
+
+4. **Delete Thread**:
+
+- In the thread list (right sidebar), click "Delete" next to a thread.
+- This removes it from your view only; others retain their copy.
+
+**Example**:
+- Alice creates a thread named "Project Discussion" with Bob and Carol.
+- She adds Dave later and removes Carol.
+- Bob deletes the thread from his view, but Alice and Dave still see it.
 
 ### 4. Send Messages
 
-- Select thread.
-- Type: "Meeting at 3 PM".
-- Attach file (≤15MB).
+1. **Select a Thread**:
+
+- Click a thread from the right sidebar (e.g., "Project Discussion").
+
+2. **Send a Message**:
+
+- Type in the text area (e.g., "Let’s meet tomorrow").
+- Optionally attach a file:
+  - **Image**: PNG, JPEG, GIF, BMP (displays inline).
+  - **Document**: PDF, TXT, DOC, DOCX (appears as a link).
+  - Maximum 15MB.
 - Click "Send".
+- Messages appear instantly for all participants via SocketIO, with a ZKP proof ensuring metadata privacy.
+
+3. **Download Files**:
+
+- Click document links to download decrypted files.
+- Images load inline automatically.
+
+**Example**:
+- Alice sends "Check this out" with a `plan.pdf` attachment.
+- Bob sees the message instantly and clicks the link to download `plan.pdf`.
+- Carol sends a `logo.png`, which displays inline in the thread.
 
 ### 5. Admin Tasks
 
-- Log in as `admin`.
-- Create/edit/delete users via Admin panel.
+1. **Access Admin Panel**:
+
+- Log in as an admin (e.g., `admin`).
+- Click "Admin" in the navigation bar.
+
+2. **Manage Users**:
+
+- **Create**: Add a new user with username, email, public key, password, and admin status.
+- **Edit**: Update username, email, public key, or admin status.
+- **Delete**: Remove a user (except yourself).
+
+**Example**:
+- Admin creates user `eve` with email `eve@example.com` and makes her an admin.
+- Admin updates Bob’s public key after rotation.
+- Admin deletes Carol’s account.
 
 ### 6. Key Rotation
 
-- Click "Rotate Key".
-- Save new private key.
+1. **Rotate Key**:
 
-### 7. Blockchain Nodes
+- Click "Rotate Key" in the navigation bar.
+- Save the new private key displayed (store securely).
+
+2. **Update Login**:
+
+- Use the new private key for future logins.
+
+**Example**:
+- Alice rotates her key, saves the new private key, and uses it to generate a new signature for login.
+
+### 7. Run Additional Blockchain Nodes
+
+To join the decentralized network with encrypted DHT:
 
 ```bash
+cd /path/to/zixt
+source venv/bin/activate
 python -m app.blockchain
 ```
 
+Connect to a bootstrap node:
+
+```python
+from app.blockchain import Blockchain
+import asyncio
+blockchain = Blockchain()
+bootstrap_nodes = [("192.168.1.100", 8468)]
+asyncio.run(blockchain.start_dht(bootstrap_nodes))
+```
+
+**Example**:
+- Alice runs a node on her server, connecting to Bob’s node at `192.168.1.100:8468` over DTLS.
+
 ## 🛡️ Security Guarantees
 
-- **Encryption**: Kyber1024, AES-256-GCM, PFS.
-- **Authentication**: SPHINCS+ signatures.
-- **Hashing**: SHA3-512.
-- **Blockchain**: SPHINCS+-signed blocks, DHT.
-- **Web Security**: CSRF, headers, HTTPS.
+Zixt is designed with state-of-the-art security:
+
+- **Post-Quantum Cryptography**:
+  - Kyber1024 and AES-256-GCM for quantum-resistant encryption with PFS.
+  - SPHINCS+ for secure authentication and blockchain signatures.
+  - SHA3-512 for robust hashing.
+
+- **Zero-Knowledge Proofs**:
+  - zk-SNARKs hide user identities and message metadata, ensuring privacy even in the database and blockchain.
+
+- **Encrypted DHT**:
+  - DTLS secures Kademlia DHT traffic, protecting block metadata and preventing eavesdropping.
+
+- **Blockchain**:
+  - Immutable ledger with SPHINCS+ signatures and ZKP proofs.
+  - Decentralized peer discovery via encrypted DHT.
+
+- **Web Security**:
+  - CSRF protection with Flask-WTF.
+  - Security headers: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy.
+  - HTTPS with Let’s Encrypt and ECDHE ciphers for TLS PFS.
+
+- **Key Management**:
+  - SPHINCS+ key rotation every 30 days, with 90-day history.
+  - Ephemeral Kyber keys per message.
 
 ## 🐛 Troubleshooting
 
-- **Database**: `sudo tail -f /var/log/mysql/error.log`.
-- **SocketIO**: `sudo systemctl status redis`.
-- **Files**: `ls -ld app/uploads`.
-- **Email**: `telnet smtp.gmail.com 465`.
-- **Nginx**: `sudo nginx -t`.
+- **Database Issues**:
+  - Verify schema: `mysql -u root -p -e "USE zixt_db; DESCRIBE user;"`.
+  - Check logs: `sudo tail -f /var/log/mysql/error.log`.
+
+- **SocketIO/Real-Time**:
+  - Ensure Redis: `sudo systemctl status redis`.
+  - Verify Gunicorn: `ps aux | grep gunicorn`.
+
+- **File Uploads**:
+  - Check permissions: `ls -ld app/uploads`.
+  - Ensure ≤15MB and correct file types.
+
+- **Email**:
+  - Test SMTP: `telnet smtp.gmail.com 465`.
+  - Use [Mailtrap](https://mailtrap.io/) for debugging.
+
+- **Nginx**:
+  - Validate config: `sudo nginx -t`.
+  - Check logs: `sudo tail -f /var/log/nginx/error.log`.
+
+- **DHT**:
+  - Ensure port 8468 (UDP) is open: `sudo ufw allow 8468/udp`.
+  - Verify DTLS certificates: `ls -l certs/server.crt certs/server.key`.
+  - Check connectivity: `netstat -tuln | grep 8468`.
+
+- **ZKP**:
+  - Verify circuit files: `ls app/circuits/*.wasm app/circuits/*.zkey`.
+  - Check `snarkjs`: `node -e "require('snarkjs')"`.
 
 ## 📚 References
 
 - [liboqs](https://openquantumsafe.org)
 - [Flask](https://flask.palletsprojects.com)
-- [SocketIO](https://flask-socketio.readthedocs.io)
+- [Flask-SocketIO](https://flask-socketio.readthedocs.io)
 - [Redis](https://redis.io/docs)
-- [Kademlia](https://github.com/bmuller/kademlia)
-- [OWASP](https://owasp.org/www-project-secure-headers)
+- [Kademlia DHT](https://github.com/bmuller/kademlia)
+- [circom](https://docs.circom.io)
+- [snarkjs](https://github.com/iden3/snarkjs)
+- [OpenSSL DTLS](https://www.openssl.org/docs/man3.0/man7/dtls.html)
+- [OWASP Secure Headers](https://owasp.org/www-project-secure-headers)
 - [Let's Encrypt](https://letsencrypt.org)
+- [NIST PQC Standards](https://csrc.nist.gov/projects/post-quantum-cryptography)
 
 ## 📜 License
 
-MIT License. See [LICENSE](LICENSE).
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🤝 Contributing
 
-Open issues/pull requests on [GitHub](https://github.com/NetworkNerd1337/zixt).
+Contributions are welcome! Want to join our team of security-minded developers who want to change the world? Please open an issue or submit a pull request with improvements and lets talk!
 
 ## 📧 Contact
 
-[inquries@zixt.app](mailto:inquries@zixt.app) or GitHub issues for the Zixt repo.
+For questions or support, contact [inquries@zixt.app](mailto:inquries@zixt.app) or open an issue on GitHub.
 
 ---
 
