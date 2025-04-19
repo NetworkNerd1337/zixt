@@ -20,12 +20,17 @@ No unreleased changes at this time.
 - **Circuit Files**:
   - Added `auth.circom` and `message.circom` for authentication and message proofs.
   - Generated `.wasm` and `.zkey` files for client-side proof generation.
+- **DHT Security with DTLS**:
+  - Implemented DTLS (Datagram TLS) for encrypting Kademlia DHT traffic over UDP port 8468, protecting block metadata and preventing eavesdropping.
+  - Added DTLS certificate generation and configuration for secure peer discovery and block propagation.
+  - Updated `app/dht.py` to use a `DTLSServer` class with SSL context.
+  - Modified `app/blockchain.py` to integrate with DTLS-enabled DHT.
 
 ### Changed
 - Updated `routes.py` to verify ZKP proofs for login and message sending.
 - Modified `models.py` and `setup.sql` to support ZKP storage.
 - Enhanced `script.js` for client-side proof generation with `snarkjs`.
-- Updated `blockchain.py` to include ZKP proofs in blocks.
+- Updated `blockchain.py` to include ZKP proofs and use DTLS-enabled DHT.
 - Changed `liboqs-python` installation to use source from GitHub instead of PyPI `oqs==0.10.1` to resolve `ImportError`.
 
 ### Fixed
@@ -35,7 +40,7 @@ No unreleased changes at this time.
 ## [1.0.1] - 2025-04-16
 
 ### Added
-- Initial release of Zixt with post-quantum cryptography (Kyber1024, SPHINCS+, AES-256-GCM, SHA3-512).
+- Initial release with post-quantum cryptography (Kyber1024, SPHINCS+, AES-256-GCM, SHA3-512).
 - Real-time messaging with SocketIO/Redis.
 - File attachments (≤15MB, images/documents).
 - Proprietary blockchain with Kademlia DHT.
