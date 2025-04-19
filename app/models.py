@@ -20,6 +20,12 @@ class UserKeyHistory(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     expires_at = db.Column(db.DateTime, nullable=False)
 
+class UserPublicKeyHash(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    public_key_hash = db.Column(db.String(128), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 class Thread(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -35,10 +41,9 @@ class ThreadParticipant(db.Model):
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     thread_id = db.Column(db.Integer, db.ForeignKey('thread.id'), nullable=False)
-    sender = db.Column(db.String(80), nullable=False)
     content = db.Column(db.Text, nullable=False)
     ciphertext = db.Column(db.Text, nullable=False)
+    zkp_proof = db.Column(db.LargeBinary, nullable=False)
     file_path = db.Column(db.String(256), nullable=True)
     file_name = db.Column(db.String(100), nullable=True)
     file_type = db.Column(db.String(50), nullable=True)
-    timestamp = db.Column(db.DateTime, default=db.func.now())
