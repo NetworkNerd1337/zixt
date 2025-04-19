@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Login</h2>
-<form method="POST">
-    <label>Username:</label>
-    <input type="text" name="username" required><br>
-    <label>Signature (Base64):</label>
-    <textarea name="signature" required></textarea><br>
+<form method="POST" id="login-form">
+    <label>Public Key Hash:</label>
+    <input type="text" name="public_key_hash" required><br>
+    <label>ZKP Proof (JSON):</label>
+    <textarea name="zkp_proof" required></textarea><br>
     <label>Private Key (Base64):</label>
     <textarea name="private_key" required></textarea><br>
     <button type="submit">Login</button>
