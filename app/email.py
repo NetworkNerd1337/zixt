@@ -5,7 +5,6 @@ from flask import url_for
 import hashlib
 import os
 
-
 class EmailService:
     def __init__(self, smtp_server, smtp_port, sender_email, sender_password):
         self.smtp_server = smtp_server
@@ -18,7 +17,7 @@ class EmailService:
 
     def send_verification_email(self, recipient_email, username, token):
         verification_url = url_for('main.verify_email', token=token, _external=True)
-
+        
         msg = MIMEMultipart()
         msg['From'] = self.sender_email
         msg['To'] = recipient_email
