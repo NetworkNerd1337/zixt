@@ -10,4 +10,5 @@ redis==5.0.8
 bleach==6.1.0
 flask-wtf==1.2.1
 eventlet==0.36.1
-web3==6.20.0
+bulletproofs==0.1.0  # For server-side Bulletproofs
+pycurve25519==0.2.0  # Curve25519 bindings for Bulletproofs
