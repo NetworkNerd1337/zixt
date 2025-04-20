@@ -43,7 +43,7 @@ class Message(db.Model):
     thread_id = db.Column(db.Integer, db.ForeignKey('thread.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
     ciphertext = db.Column(db.Text, nullable=False)
-    zkp_proof = db.Column(db.LargeBinary, nullable=False)
+    bulletproof = db.Column(db.Text, nullable=False)  # Store Base64-encoded Bulletproof
     file_path = db.Column(db.String(256), nullable=True)
     file_name = db.Column(db.String(100), nullable=True)
     file_type = db.Column(db.String(50), nullable=True)
