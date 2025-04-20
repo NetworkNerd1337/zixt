@@ -6,7 +6,25 @@ All notable changes to the Zixt secure messaging application are documented in t
 
 No unreleased changes at this time.
 
-## [1.0.2] - 2025-04-19
+## [1.0.3] - 2025-04-20
+
+### Added
+- **PBFT Consensus Mechanism**:
+  - Implemented a lightweight Practical Byzantine Fault Tolerance (PBFT) consensus mechanism to ensure all nodes agree on the blockchain ledger.
+  - Supports fault tolerance for up to f faulty nodes in a network of 3f + 1 nodes, using pre-prepare, prepare, and commit phases.
+  - Integrated with SPHINCS+ signatures and ZKP proofs for secure block validation.
+  - Added primary node rotation every 10 blocks for decentralization.
+  - Updated `app/blockchain.py` to manage consensus phases and `app/dht.py` to broadcast consensus messages via DTLS-encrypted DHT.
+
+### Changed
+- Enhanced `app/blockchain.py` to propose and validate blocks through PBFT consensus before appending to the chain.
+- Modified `app/dht.py` to handle consensus message types (`pre_prepare`, `prepare`, `commit`) asynchronously.
+- Updated `README.md` to include instructions for running nodes with consensus and minimum node requirements.
+
+### Fixed
+- Ensured blockchain consistency by requiring 2f + 1 votes for block commitment, preventing invalid block propagation.
+
+## [1.0.2] - 2025-04-20
 
 ### Added
 - **Zero Knowledge Proofs (ZKPs)**:
@@ -55,6 +73,7 @@ No unreleased changes at this time.
 ### Fixed
 - N/A (initial release).
 
-[Unreleased]: https://github.com/NetworkNerd1337/zixt/compare/v1.0.2...HEAD
-[1.0.2]: https://github.com/NetworkNerd1337/zixt/compare/v1.0.1...v1.0.2
-[1.0.1]: https://github.com/NetworkNerd1337/zixt/releases/tag/v1.0.1
+[Unreleased]: https://github.com/yourusername/zixt/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/yourusername/zixt/compare/v1.0.2...v1.0.3
+[1.0.2]: https://github.com/yourusername/zixt/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/yourusername/zixt/releases/tag/v1.0.1
