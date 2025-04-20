@@ -6,6 +6,7 @@ import time
 import asyncio
 import logging
 from collections import defaultdict
+from bulletproofs import Bulletproof
 
 logging.basicConfig(level=logging.INFO)
 
@@ -14,7 +15,7 @@ class Block:
         self.index = index
         self.previous_hash = previous_hash
         self.timestamp = timestamp
-        self.data = data  # Includes zkp_proof
+        self.data = data  # Includes bulletproof
         self.signature = signature
         self.hash = self.calculate_hash()
 
@@ -39,6 +40,7 @@ class Blockchain:
         self.commit_votes = defaultdict(set)  # {block_hash: set(node_ids)}
         self.fault_tolerance = 1  # f, where N >= 3f + 1
         self.rotation_interval = 10  # Rotate primary every 10 blocks
+        self.bulletproof = Bulletproof()
 
     def create_genesis_block(self):
         data = {"message": "Genesis Block"}
@@ -49,13 +51,11 @@ class Blockchain:
         if bootstrap_nodes:
             await self.dht_server.bootstrap(bootstrap_nodes)
         logging.info(f"DHT node started with ID: {self.node_id}")
-        # Register node with public key
         await self.dht_server.set(f"node_{self.node_id}", json.dumps({
-            "ip": "0.0.0.0",  # Local binding, resolved by DHT
+            "ip": "0.0.0.0",
             "port": 8468,
             "public_key": base64.b64encode(self.crypto.sig.generate_keypair()).decode()
         }))
-        # Fetch known nodes
         await self.update_nodes()
 
     async def stop_dht(self):
@@ -69,7 +69,7 @@ class Blockchain:
                 data = json.loads(node_data)
                 nodes[node_id] = (data["ip"], data["port"], base64.b64decode(data["public_key"]))
         self.nodes = nodes
-        self.fault_tolerance = (len(self.nodes) - 1) // 3  # f = (N-1)/3
+        self.fault_tolerance = (len(self.nodes) - 1) // 3
 
     def get_primary_node(self, block_index):
         node_ids = sorted(self.nodes.keys())
@@ -129,8 +129,12 @@ class Blockchain:
         )
         if block.hash != block_hash or block.index != self.chain[-1].index + 1:
             return
-        if not self.crypto.verify_user(block_data["data"]["sender_public_key"], block.signature, json.dumps(block_data["data"], sort_keys=True).encode()):
+        if not self.crypto.verify_user(block_data["data"].get("sender_public_key", ""), block.signature, json.dumps(block_data["data"], sort_keys=True).encode()):
             return
+        if "bulletproof" in block_data["data"]:
+            proof = base64.b64decode(block_data["data"]["bulletproof"])
+            if not self.bulletproof.verify(proof, block_data["data"]["public_inputs"]):
+                return
         self.pending_blocks[block_hash] = block
         await self.dht_server.set(f"prepare_{block_hash}_{self.node_id}", json.dumps({
             "block_hash": block_hash,
