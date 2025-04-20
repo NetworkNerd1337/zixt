@@ -8,14 +8,8 @@
 │   ├── models.py
 │   ├── email.py
 │   ├── /circuits
-│   │   ├── auth.circom
-│   │   ├── message.circom
-│   │   ├── auth.wasm
-│   │   ├── auth_0001.zkey
-│   │   ├── message.wasm
-│   │   ├── message_0001.zkey
-│   │   ├── auth_verification_key.json
-│   │   ├── message_verification_key.json
+│   │   ├── auth_bp.py  (New: Bulletproofs circuit)
+│   │   ├── message_bp.py (New: Bulletproofs circuit)
 │   ├── /uploads
 │   └── /templates
 │       ├── base.html
@@ -28,11 +22,7 @@
 ├── /static
 │   ├── style.css
 │   ├── script.js
-│   ├── /circuits
-│   │   ├── auth.wasm
-│   │   ├── auth_0001.zkey
-│   │   ├── message.wasm
-│   │   ├── message_0001.zkey
+│   ├── bulletproofs.wasm (New: WASM for client-side Bulletproofs)
 ├── /certs
 │   ├── server.crt
 │   ├── server.key
