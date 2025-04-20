@@ -12,22 +12,25 @@ document.addEventListener('DOMContentLoaded', () => {
         public_key_hash: window.sessionPublicKeyHash
     };
 
+    // Load Bulletproofs WASM (simplified, assumes bulletproofs.wasm)
+    async function loadBulletproofsWasm() {
+        const wasmModule = await fetch('/static/bulletproofs.wasm');
+        const wasmBuffer = await wasmModule.arrayBuffer();
+        return WebAssembly.instantiate(wasmBuffer, {});
+    }
+
     async function generateAuthProof(userId, publicKeyHash, secret) {
-        const { proof, publicSignals } = await snarkjs.groth16.fullProve(
-            { user_id: userId, public_key_hash: publicKeyHash, secret: secret },
-            "/static/circuits/auth.wasm",
-            "/static/circuits/auth_0001.zkey"
-        );
-        return { proof, publicSignals };
+        const wasm = await loadBulletproofsWasm();
+        const proof = wasm.instance.exports.generate_auth_proof(userId, publicKeyHash, secret);
+        const publicInputs = { public_key_hash: publicKeyHash };
+        return { proof: btoa(String.fromCharCode(...new Uint8Array(proof))), publicInputs };
     }
 
     async function generateMessageProof(threadId, userId, timestamp, secret) {
-        const { proof, publicSignals } = await snarkjs.groth16.fullProve(
-            { thread_id: threadId, user_id: userId, timestamp: timestamp, secret: secret },
-            "/static/circuits/message.wasm",
-            "/static/circuits/message_0001.zkey"
-        );
-        return { proof, publicSignals };
+        const wasm = await loadBulletproofsWasm();
+        const proof = wasm.instance.exports.generate_message_proof(threadId, userId, timestamp, secret);
+        const publicInputs = { thread_id: threadId };
+        return { proof: btoa(String.fromCharCode(...new Uint8Array(proof))), publicInputs };
     }
 
     if (loginForm) {
@@ -36,11 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData(loginForm);
             const publicKeyHash = formData.get('public_key_hash');
             const privateKey = formData.get('private_key');
-            const userId = session.user_id; // Assume fetched
+            const userId = session.user_id;
 
             try {
-                const { proof, publicSignals } = await generateAuthProof(userId, publicKeyHash, privateKey);
-                formData.set('zkp_proof', JSON.stringify({ proof, publicSignals }));
+                const { proof, publicInputs } = await generateAuthProof(userId, publicKeyHash, privateKey);
+                formData.set('bulletproof', JSON.stringify({ proof, publicInputs }));
                 const response = await fetch('/login', {
                     method: 'POST',
                     body: formData
@@ -68,11 +71,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const secret = session.secret;
 
             try {
-                const { proof, publicSignals } = await generateMessageProof(threadId, userId, timestamp, secret);
+                const { proof, publicInputs } = await generateMessageProof(threadId, userId, timestamp, secret);
                 socket.emit('send_message', {
                     thread_id: threadId,
                     content: content,
-                    zkp_proof: JSON.stringify({ proof, publicSignals })
+                    bulletproof: JSON.stringify({ proof, publicInputs })
                 });
                 messageForm.reset();
             } catch (error) {
