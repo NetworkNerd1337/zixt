@@ -1,6 +1,6 @@
 # Zixt Version
 
-**Current Version**: 1.0.3
+**Current Version**: 1.0.4
 
 This file tracks the version of the Zixt secure messaging application. For detailed release notes and changes, refer to the [CHANGELOG.md](CHANGELOG.md).
 
