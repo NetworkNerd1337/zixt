@@ -6,6 +6,27 @@ All notable changes to the Zixt secure messaging application are documented in t
 
 No unreleased changes at this time.
 
+## [1.0.4] - 2025-04-20
+
+### Added
+- **Bulletproofs ZKP Implementation**:
+  - Replaced zk-SNARKs with Bulletproofs for private user authentication and anonymous message metadata, eliminating trusted setup risks.
+  - Added `bulletproofs` and `pycurve25519` libraries for server-side proof verification.
+  - Implemented client-side proof generation using WebAssembly (bulletproofs.wasm, placeholder).
+  - Created `auth_bp.py` and `message_bp.py` circuits for authentication and message metadata proofs.
+  - Updated `message` table to store Bulletproofs proofs (larger, ~1-2KB).
+
+### Changed
+- Updated `app/routes.py` to verify Bulletproofs proofs for login and messaging.
+- Modified `app/blockchain.py` to include and validate Bulletproofs proofs in blocks.
+- Adjusted `app/dht.py` to handle larger consensus messages with Bulletproofs proofs.
+- Updated `static/script.js` for client-side Bulletproofs proof generation.
+- Modified `setup.sql` and `app/models.py` to support Bulletproofs proof storage.
+- Updated `README.md` to include Bulletproofs setup and dependencies.
+
+### Fixed
+- Ensured compatibility with PBFT consensus and DTLS-encrypted DHT for larger Bulletproofs proofs.
+
 ## [1.0.3] - 2025-04-20
 
 ### Added
@@ -73,7 +94,8 @@ No unreleased changes at this time.
 ### Fixed
 - N/A (initial release).
 
-[Unreleased]: https://github.com/NetworkNerd1337/zixt/compare/v1.0.3...HEAD
+[Unreleased]: https://github.com/NetworkNerd1337/zixt/compare/v1.0.4...HEAD
+[1.0.4]: https://github.com/NetworkNerd1337/zixt/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/NetworkNerd1337/zixt/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/NetworkNerd1337/zixt/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/NetworkNerd1337/zixt/releases/tag/v1.0.1
