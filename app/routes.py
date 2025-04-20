@@ -14,13 +14,13 @@ from werkzeug.utils import secure_filename
 from mimetypes import guess_type
 from datetime import datetime
 import io
-import subprocess
-import json
-from web3 import Web3
+import hashlib
+from bulletproofs import Bulletproof
 
 main = Blueprint('main', __name__)
 crypto = Crypto()
 blockchain = Blockchain()
+bulletproof = Bulletproof()
 
 ALLOWED_IMAGE_TYPES = {'image/png', 'image/jpeg', 'image/gif', 'image/bmp'}
 ALLOWED_DOCUMENT_TYPES = {'application/pdf', 'text/plain', 'application/msword', 
@@ -33,28 +33,8 @@ def allowed_file(filename, content_type):
     return (ext in ALLOWED_EXTENSIONS and 
             (content_type in ALLOWED_IMAGE_TYPES or content_type in ALLOWED_DOCUMENT_TYPES))
 
-def verify_zkp(circuit_name, proof, public_inputs):
-    proof_json = json.dumps(proof)
-    public_inputs_json = json.dumps(public_inputs)
-    with open(f"/tmp/{circuit_name}_proof.json", "w") as f:
-        f.write(proof_json)
-    with open(f"/tmp/{circuit_name}_public.json", "w") as f:
-        f.write(public_inputs_json)
-    result = subprocess.run(
-        [
-            "node",
-            "--experimental-modules",
-            f"/home/rhuff/zixt/node_modules/snarkjs/cli.js",
-            "groth16",
-            "verify",
-            f"/home/rhuff/zixt/app/circuits/{circuit_name}_verification_key.json",
-            f"/tmp/{circuit_name}_public.json",
-            f"/tmp/{circuit_name}_proof.json",
-        ],
-        capture_output=True,
-        text=True
-    )
-    return "true" in result.stdout.lower()
+def verify_bulletproof(proof, public_inputs):
+    return bulletproof.verify(proof, public_inputs)
 
 class MessageForm(FlaskForm):
     content = TextAreaField('Message')
@@ -80,13 +60,15 @@ def index():
 def login():
     if request.method == 'POST':
         public_key_hash = request.form['public_key_hash']
-        zkp_proof = json.loads(request.form['zkp_proof'])
+        bulletproof_data = json.loads(request.form['bulletproof'])
+        proof = base64.b64decode(bulletproof_data["proof"])
+        public_inputs = bulletproof_data["public_inputs"]
         user = UserPublicKeyHash.query.filter_by(public_key_hash=public_key_hash).first()
         if not user:
             flash('User not found', 'danger')
         elif not user.user.is_verified:
             flash('Email not verified', 'danger')
-        elif verify_zkp('auth', zkp_proof, [public_key_hash]):
+        elif verify_bulletproof(proof, public_inputs):
             session['user_id'] = user.user_id
             session['username'] = user.user.username
             session['is_admin'] = user.user.is_admin
@@ -442,7 +424,9 @@ def handle_message(data):
     
     thread_id = data['thread_id']
     content = bleach.clean(data['content'].strip())
-    zkp_proof = json.loads(data['zkp_proof'])
+    bulletproof_data = json.loads(data['bulletproof'])
+    proof = base64.b64decode(bulletproof_data["proof"])
+    public_inputs = bulletproof_data["public_inputs"]
     file = request.files.get('file') if 'file' in request.files else None
     
     if not content and not file:
@@ -458,7 +442,7 @@ def handle_message(data):
     ).first():
         return
     
-    if not verify_zkp('message', zkp_proof, [thread_id]):
+    if not verify_bulletproof(proof, public_inputs):
         emit('message_error', {'error': 'Invalid proof'}, to=f"user_{session['user_id']}")
         return
     
@@ -493,7 +477,7 @@ def handle_message(data):
             thread_id=thread_id,
             content=encrypted_content,
             ciphertext=base64.b64encode(ciphertext).decode(),
-            zkp_proof=json.dumps(zkp_proof).encode(),
+            bulletproof=base64.b64encode(proof).decode(),
             file_path=file_path,
             file_name=file_name,
             file_type=file_type
@@ -506,10 +490,12 @@ def handle_message(data):
         "thread_id": thread_id,
         "content": encrypted_content,
         "ciphertext": base64.b64encode(ciphertext).decode(),
-        "zkp_proof": json.dumps(zkp_proof),
+        "bulletproof": base64.b64encode(proof).decode(),
+        "public_inputs": public_inputs,
         "file_path": file_path,
         "file_name": file_name,
-        "file_type": file_type
+        "file_type": file_type,
+        "sender_public_key": base64.b64encode(sender_public_key).decode()
     }
     blockchain.add_block(block_data, base64.b64decode(session['private_key']))
     
