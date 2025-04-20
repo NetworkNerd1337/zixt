@@ -57,7 +57,7 @@ CREATE TABLE message (
     thread_id INT NOT NULL,
     content TEXT NOT NULL,
     ciphertext TEXT NOT NULL,
-    zkp_proof BLOB NOT NULL,
+    bulletproof TEXT NOT NULL,
     file_path VARCHAR(256),
     file_name VARCHAR(100),
     file_type VARCHAR(50),
