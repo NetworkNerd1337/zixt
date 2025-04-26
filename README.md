@@ -123,7 +123,7 @@ sudo apt install -y build-essential cmake ninja-build libssl-dev
 git clone --branch 0.10.1 https://github.com/open-quantum-safe/liboqs.git
 cd liboqs
 mkdir build && cd build
-cmake -GNinja -DOQS_ALGS_ENABLED=ALL -DOPENSSL_ROOT_DIR=/usr -DOPENSSL_CRYPTO_LIBRARY=/usr/lib/x86_64-linux-gnu/libcrypto.so ..
+cmake -GNinja -DOQS_ALGS_ENABLED=ALL -DOPENSSL_ROOT_DIR=/usr -DOPENSSL_CRYPTO_LIBRARY=/usr/lib/x86_64-linux-gnu/libcrypto.so
 ninja
 sudo ninja install
 ```
