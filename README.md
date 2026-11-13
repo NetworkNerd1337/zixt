@@ -1,8 +1,12 @@
+![Zixt in the browser: sign-in, registration, and a thread with two participants](docs/demo.gif)
+
 # Zixt: Quantum-Secure Messaging Platform
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Ubuntu 24.04](https://img.shields.io/badge/OS-Ubuntu%2024.04-orange.svg)](https://ubuntu.com/)
+
+More from me: [ryanthomashuff.com](https://ryanthomashuff.com/software/#zixt)
 
 **Zixt** is a cutting-edge, web-based messaging application engineered for unparalleled security and privacy. Built with **post-quantum cryptography** (Kyber1024, SPHINCS+), **Bulletproofs zero-knowledge proofs**, **encrypted DHT**, and a **PBFT consensus mechanism**, Zixt protects communications and metadata against classical and quantum threats. It offers real-time multi-user message threads, secure file sharing, a proprietary blockchain ledger, and robust user management, running on **Ubuntu 24.04** with Flask, SocketIO, Redis, Gunicorn, Nginx, and MySQL, secured by Let's Encrypt HTTPS.
 
@@ -947,6 +951,12 @@ Contributions are welcome! Please open an issue or submit a pull request with im
 ## 📧 Contact
 
 For questions or support, contact [inquiries@zixt.app](mailto:inquiries@zixt.app) or open an issue on GitHub.
+
+## 👤 About
+
+Zixt is maintained by [Ryan Thomas Huff](https://ryanthomashuff.com/software/#zixt) ([NetworkNerd1337](https://github.com/NetworkNerd1337)).
+
+More from me: [ryanthomashuff.com](https://ryanthomashuff.com/software/#zixt)
 
 ---
 
